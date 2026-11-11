@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Project Alpha</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="card">
+      <h1>Contact Us</h1>
+      <p class="subtitle">Tell us about your business and we will get back to you soon.</p>
+
+      <form id="lead-form" novalidate>
+
+        <div class="field">
+          <label for="name">Full name *</label>
+          <input type="text" id="name" placeholder="e.g. Rahim Uddin">
+        </div>
+
+        <div class="field">
+          <label for="email">Email *</label>
+          <input type="email" id="email" placeholder="you@example.com">
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone *</label>
+          <input type="text" id="phone" placeholder="01XXXXXXXXX">
+        </div>
+
+        <div class="field">
+          <label for="company">Company name (optional)</label>
+          <input type="text" id="company" placeholder="Your company">
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="business_type">Business type *</label>
+            <select id="business_type">
+              <option value="">-- Select --</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Retail">Retail</option>
+              <option value="Education">Education</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="IT">IT</option>
+              <option value="Telecom">Telecom</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="service">Service interested in *</label>
+            <select id="service">
+              <option value="">-- Select --</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Website">Website</option>
+              <option value="Consultancy">Consultancy</option>
+              <option value="Training">Training</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="message">Message *</label>
+          <textarea id="message" rows="5" placeholder="Tell us what you need..."></textarea>
+        </div>
+
+        <button type="submit" id="submit-btn">Submit Enquiry</button>
+
+        <div id="form-message"></div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ---- Setting: webhook address ----
+    // Testing-er somoy Test URL, Day 12-te Production URL boshabo
+    const WEBHOOK_URL = "http://localhost:5678/webhook-test/lead-submit";
+
+    const form = document.getElementById("lead-form");
+    const messageBox = document.getElementById("form-message");
+    const submitBtn = document.getElementById("submit-btn");
+
+    function showMessage(text, type) {
+      messageBox.textContent = text;
+      messageBox.className = type; // "success" or "error"
+    }
+
+    function validate(data) {
+      if (data.name.length < 2 || data.name.length > 80) {
+        return "Please enter your full name (2 to 80 characters).";
+      }
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(data.email)) {
+        return "Please enter a valid email address.";
+      }
+      const phonePattern = /^01\d{9}$/;
+      if (!phonePattern.test(data.phone)) {
+        return "Phone must be 11 digits and start with 01.";
+      }
+      if (data.business_type === "") {
+        return "Please select your business type.";
+      }
+      if (data.service === "") {
+        return "Please select the service you are interested in.";
+      }
+      if (data.message.length < 10 || data.message.length > 1000) {
+        return "Message must be between 10 and 1000 characters.";
+      }
+      return ""; // no error
+    }
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault(); // page reload hobe na
+
+      const data = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        business_type: document.getElementById("business_type").value,
+        service: document.getElementById("service").value,
+        message: document.getElementById("message").value.trim()
+      };
+
+      const errorText = validate(data);
+      if (errorText !== "") {
+        showMessage(errorText, "error");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          showMessage("Thank you! We received your enquiry.", "success");
+          form.reset();
+        } else {
+          showMessage("Something went wrong. Please try again.", "error");
+        }
+      } catch (error) {
+        console.error(error);
+        showMessage("Could not connect to the server. Please try again later.", "error");
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Enquiry";
+    });
+  </script>
+
+</body>
+</html>
