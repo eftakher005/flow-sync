@@ -382,7 +382,7 @@ function vHealth() {
   const mail = acts.filter(a => /email/i.test(a.activity_type || "")).map(a => a.timestamp).sort().pop(), er = acts.filter(a => /error/i.test(a.activity_type || "")).length;
   return `<div class="row">${card("n8n server", st(hl.n8n), lb(hl.n8n), hl.n8n ? (hl.n8n.ok ? "Last successful request: " + esc(hl.n8n.t) : "Last error: " + esc(hl.n8n.err)) : "Not used yet in this session. It is checked when you add a lead or ask SyncBot.")}
   ${card("Supabase database (your leads)", st(hl.sheets), lb(hl.sheets), hl.sheets ? (hl.sheets.ok ? "Loaded " + leads.length + " leads at " + esc(hl.sheets.t) : "Last error: " + esc(hl.sheets.err)) : "No request made yet.")}
-  ${card("Groq AI (through n8n)", st(hl.ai), lb(hl.ai), hl.ai ? (hl.ai.ok ? "Last assistant reply: " + esc(hl.ai.t) : "Last error: " + esc(hl.ai.err)) : "Ask SyncBot a question to verify it.")}
+  ${card("Gemini AI (through n8n)", st(hl.ai), lb(hl.ai), hl.ai ? (hl.ai.ok ? "Last assistant reply: " + esc(hl.ai.t) : "Last error: " + esc(hl.ai.err)) : "Ask SyncBot a question to verify it.")}
   ${card("Email service", mail ? "pd" : "nd", mail ? "Activity recorded" : "No activity yet", mail ? "Last email in Activity_Log: " + esc(mail) + ". Errors logged: " + er : "No email is recorded in Activity_Log yet.")}</div>
   <p style="color:var(--mut);font-size:13px">A status says "Verified" only after a real request to n8n succeeded in this session. Secret keys never appear in this page.</p>`;
 }
